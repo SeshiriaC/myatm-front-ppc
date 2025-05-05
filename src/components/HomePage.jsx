@@ -1,74 +1,142 @@
 import React from "react";
-import { Typography, Button, Box, Container } from "@mui/material";
-import { useNavigate } from "react-router-dom"; // Pour la navigation
+import { Container, Typography, Button, Box, Paper } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
-  const navigate = useNavigate(); // Hook pour la navigation
+  const navigate = useNavigate();
+
+  const handleNavigateToOperations = () => {
+    navigate("/operations"); // Rediriger vers la page des opérations
+  };
+
+  const handleNavigateToBalance = () => {
+    navigate("/balance"); // Rediriger vers la page de consultation du solde
+  };
+
+  const handleNavigateToWithdraw = () => {
+    navigate("/withdraw"); // Rediriger vers la page de retrait
+  };
 
   const handleLogout = () => {
-    // Logique de déconnexion (vider le token)
-    localStorage.removeItem("token");
-    navigate("/"); // Rediriger vers la page de connexion après déconnexion
+    localStorage.removeItem("token"); // Retirer le token et déconnecter l'utilisateur
+    navigate("/"); // Rediriger vers la page de login
   };
 
   return (
     <Container
-      maxWidth="xs"
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
+        display: "flex", 
+        justifyContent: "center", 
+        alignItems: "center", 
+        height: "100vh", 
       }}
     >
-      <Box
+      <Paper
         sx={{
           padding: 4,
           borderRadius: 2,
           boxShadow: 3,
           backgroundColor: "#ffffff",
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          flexDirection: "row", 
+          justifyContent: "space-between", 
+          alignItems: "center", 
+          width: "100%",
+          maxWidth: "800px", 
         }}
       >
-        <Typography variant="h4" component="h1" gutterBottom>
-          BankName
-        </Typography>
-        <Typography variant="h5" color="textSecondary" gutterBottom>
-          Bienvenue <span style={{ fontWeight: "bold" }}>userName</span>
-        </Typography>
+        {/* Section gauche : typographie */}
+        <Box sx={{ display: "flex", flexDirection: "column", width: "50%" }}>
+          <Paper
+            sx={{
+              boxShadow: 0,
+              display: "flex",
+              flexDirection: "column", 
+              justifyContent: "space-between", 
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              variant="h1"
+              component="h1"
+              gutterBottom
+              sx={{
+                fontWeight: "bold",
+              }}
+            >
+              myATM
+            </Typography>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{
+                fontSize: "1.5rem", 
+                fontWeight: "normal",
+              }}
+            >
+              Bienvenu(e) !
+            </Typography>
+          </Paper>
+        </Box>
 
-        <Button
-          variant="outlined"
-          sx={{ width: "100%", mb: 2 }}
-          onClick={() => navigate("/solde")} // Remplacer par la page correspondante
+        {/* Section droite : boutons */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end", // Alignement des boutons à droite
+            width: "50%",
+            gap: 2, // Espacement entre les boutons
+          }}
         >
-          Consultation de solde
-        </Button>
-        <Button
-          variant="outlined"
-          sx={{ width: "100%", mb: 2 }}
-          onClick={() => navigate("/historique")} // Remplacer par la page correspondante
-        >
-          Historique des opérations
-        </Button>
-        <Button
-          variant="outlined"
-          sx={{ width: "100%", mb: 2 }}
-          onClick={() => navigate("/retrait")} // Remplacer par la page correspondante
-        >
-          Retrait
-        </Button>
-        <Button
-          variant="outlined"
-          sx={{ width: "100%", mb: 2 }}
-          onClick={handleLogout} // Déconnexion
-        >
-          Déconnexion
-        </Button>
-      </Box>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "#646cff",
+              "&:hover": { backgroundColor: "#535bf2" },
+              width: "200px", // Largeur fixée des boutons
+            }}
+            onClick={handleNavigateToBalance}
+          >
+            Consultation de solde
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "#646cff",
+              "&:hover": { backgroundColor: "#535bf2" },
+              width: "200px", // Largeur fixée des boutons
+            }}
+            onClick={handleNavigateToOperations}
+          >
+            Historique des opérations
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "#646cff",
+              "&:hover": { backgroundColor: "#535bf2" },
+              width: "200px", // Largeur fixée des boutons
+            }}
+            onClick={handleNavigateToWithdraw}
+          >
+            Retrait
+          </Button>
+          <Button
+            variant="outlined"
+            sx={{
+              backgroundColor: "#fff",
+              borderColor: "#646cff",
+              color: "#646cff",
+              "&:hover": { borderColor: "#535bf2", color: "#535bf2" },
+              width: "200px", // Largeur fixée des boutons
+            }}
+            onClick={handleLogout}
+          >
+            Déconnexion
+          </Button>
+        </Box>
+      </Paper>
     </Container>
   );
 };
