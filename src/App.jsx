@@ -5,6 +5,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Im
 import LoginPage from "./components/LoginPage";
 import HomePage from "./components/HomePage";
 import AdminDashboard from "./components/AdminDashboard";
+import BalancePage from "./components/BalancePage";
+import WithdrawPage from "./components/WithdrawPage";
 
 const App = () => {
   return (
@@ -18,6 +20,10 @@ const App = () => {
 
         {/* Route pour l'interface admin */}
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
+
+        <Route path="/balance" element={<BalancePage />} />
+
+        <Route path="/withdraw" element={<WithdrawPage />} />
       </Routes>
     </Router>
   );

@@ -2,6 +2,12 @@ import React from "react";
 import { Container, Typography, Button, Box, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
+// Import des icônes MUI
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+
 const HomePage = () => {
   const navigate = useNavigate();
 
@@ -25,10 +31,10 @@ const HomePage = () => {
   return (
     <Container
       sx={{
-        display: "flex", 
-        justifyContent: "center", 
-        alignItems: "center", 
-        height: "100vh", 
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
       }}
     >
       <Paper
@@ -38,21 +44,23 @@ const HomePage = () => {
           boxShadow: 3,
           backgroundColor: "#ffffff",
           display: "flex",
-          flexDirection: "row", 
-          justifyContent: "space-between", 
-          alignItems: "center", 
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
           width: "100%",
-          maxWidth: "800px", 
+          maxWidth: "850px",
+          height: "100%",
+          maxHeight: "600px"
         }}
       >
-        {/* Section gauche : typographie */}
+       
         <Box sx={{ display: "flex", flexDirection: "column", width: "50%" }}>
           <Paper
             sx={{
               boxShadow: 0,
               display: "flex",
-              flexDirection: "column", 
-              justifyContent: "space-between", 
+              flexDirection: "column",
+              justifyContent: "space-between",
               alignItems: "center",
             }}
           >
@@ -70,66 +78,88 @@ const HomePage = () => {
               variant="h6"
               gutterBottom
               sx={{
-                fontSize: "1.5rem", 
+                fontSize: "1.5rem",
                 fontWeight: "normal",
               }}
             >
-              Bienvenu(e) !
+              Bienvenue, veuillez choisir une action.
             </Typography>
           </Paper>
         </Box>
 
-        {/* Section droite : boutons */}
+        
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-end", // Alignement des boutons à droite
+            alignItems: "flex-end",
             width: "50%",
-            gap: 2, // Espacement entre les boutons
+            gap: 4, // Espacement entre les boutons
           }}
         >
           <Button
             variant="contained"
+            size="large"
+            startIcon={<AccountBalanceWalletIcon />}
             sx={{
               backgroundColor: "#646cff",
               "&:hover": { backgroundColor: "#535bf2" },
-              width: "200px", // Largeur fixée des boutons
+              width: "350px", // Largeur fixée des boutons
+              borderRadius: "50px",
+              padding: "12px 30px",
+              textTransform: "none",
             }}
             onClick={handleNavigateToBalance}
           >
             Consultation de solde
           </Button>
+
           <Button
             variant="contained"
+            size="large"
+            startIcon={<SwapHorizIcon />}
             sx={{
               backgroundColor: "#646cff",
               "&:hover": { backgroundColor: "#535bf2" },
-              width: "200px", // Largeur fixée des boutons
+              width: "350px", // Largeur fixée des boutons
+              borderRadius: "30px",
+              padding: "12px 30px",
+              textTransform: "none",
             }}
             onClick={handleNavigateToOperations}
           >
             Historique des opérations
           </Button>
+
           <Button
             variant="contained"
+            size="large"
+            startIcon={<AttachMoneyIcon />}
             sx={{
               backgroundColor: "#646cff",
               "&:hover": { backgroundColor: "#535bf2" },
-              width: "200px", // Largeur fixée des boutons
+              width: "350px", // Largeur fixée des boutons
+              borderRadius: "30px",
+              padding: "12px 30px",
+              textTransform: "none",
             }}
             onClick={handleNavigateToWithdraw}
           >
             Retrait
           </Button>
+
           <Button
             variant="outlined"
+            size="large"
+            startIcon={<ExitToAppIcon />}
             sx={{
-              backgroundColor: "#fff",
               borderColor: "#646cff",
               color: "#646cff",
               "&:hover": { borderColor: "#535bf2", color: "#535bf2" },
-              width: "200px", // Largeur fixée des boutons
+              width: "350px", // Largeur fixée des boutons
+              borderRadius: "30px",
+              padding: "12px 30px",
+              textTransform: "none",
             }}
             onClick={handleLogout}
           >
