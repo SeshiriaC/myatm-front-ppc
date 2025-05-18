@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -6,16 +6,47 @@ import {
   Button,
   Box,
   Stack,
+  CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import { getBalance } from "../services/apiService"; // Assurez-vous d'importer la fonction getBalance
 
 const BalancePage = () => {
   const navigate = useNavigate();
+  const [balance, setBalance] = useState(null); // Solde de l'utilisateur
+  const [idCompteUtilisateur, setIdCompteUtilisateur] = useState(null); // ID du compte utilisateur
+  const [loading, setLoading] = useState(true); // Indicateur de chargement
+  const [error, setError] = useState(""); // Gestion des erreurs
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const data = await getBalance(); // Appel API pour récupérer le solde et l'ID du compte
+        setBalance(data.balance); // Mettez à jour le solde
+        setIdCompteUtilisateur(data.idCompteUtilisateur); // Mettez à jour l'ID du compte utilisateur
+        setLoading(false); // Fin du chargement
+      } catch (err) {
+        setError("Erreur de récupération du solde");
+        setLoading(false);
+      }
+    };
+
+    fetchBalance();
+  }, []);
 
   const handleGoBack = () => {
     navigate("/home"); // Modifie le chemin si nécessaire
+  };
+
+  const handleWithdraw = () => {
+    navigate("/withdraw"); // Rediriger vers la page de retrait
+  };
+
+  // Fonction pour formater l'ID du compte avec des zéros devant
+  const formatAccountId = (idCompteUtilisateur) => {
+    return String(idCompteUtilisateur).padStart(4, "0"); // Ajoute des zéros devant l'ID du compte utilisateur
   };
 
   return (
@@ -85,7 +116,13 @@ const BalancePage = () => {
             Compte à vue
           </Typography>
           <Typography variant="h5" fontWeight="bold">
-            XXXX XXXX XXX
+            {loading ? (
+              <CircularProgress size={24} />
+            ) : error ? (
+              error
+            ) : (
+              `0000${formatAccountId(idCompteUtilisateur)}` // Affiche l'ID du compte avec des zéros
+            )}
           </Typography>
         </Box>
 
@@ -95,10 +132,33 @@ const BalancePage = () => {
             Montant disponible
           </Typography>
           <Typography variant="h5" fontWeight="bold">
-            MGA &nbsp; XXXXXXXXXX
+            {loading ? (
+              <CircularProgress size={24} />
+            ) : error ? (
+              error
+            ) : (
+              `MGA ${balance}` // Affiche le solde récupéré
+            )}
           </Typography>
         </Box>
       </Stack>
+
+      {/* Bouton de retrait */}
+      <Button
+        variant="contained"
+        sx={{
+          position: "absolute",
+          bottom: 24,
+          backgroundColor: "#646cff",
+          "&:hover": { backgroundColor: "#535bf2" },
+          padding: "12px 30px",
+          borderRadius: "30px",
+          width: "200px",
+        }}
+        onClick={handleWithdraw}
+      >
+        Retirer
+      </Button>
     </Container>
   );
 };

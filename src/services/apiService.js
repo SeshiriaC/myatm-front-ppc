@@ -29,9 +29,34 @@ apiRest.interceptors.request.use(
 export const login = async (mail, passwd) => {
   try {
     const response = await apiRest.post("/login", { mail, passwd });
+    console.log("Utilisateur: ", response.data);
     return response.data; // Contient le token JWT
   } catch (error) {
     throw error.response?.data || { message: "Erreur de connexion" };
+  }
+};
+
+// Fonction pour récupérer le solde
+export const getBalance = async () => {
+  const idCompteUtilisateur = localStorage.getItem("idCompteUtilisateur"); // Utiliser idCompteUtilisateur ici
+  if (!idCompteUtilisateur) {
+    console.log("! idCompteUtilisateur");
+    throw new Error("ID du compte utilisateur introuvable");
+  }
+
+  try {
+    // Appel à l'API pour récupérer le solde de l'utilisateur
+    const response = await apiRest.get(`/comptes/solde/${idCompteUtilisateur}`);
+
+    // Récupérer le solde et l'ID du compte
+    return {
+      balance: response.data.solde, // Récupérer le solde
+      idCompteUtilisateur: response.data.idCompteUtilisateur, // Récupérer l'ID du compte utilisateur
+    };
+  } catch (error) {
+    throw (
+      error.response?.data || { message: "Erreur de récupération du solde" }
+    );
   }
 };
 

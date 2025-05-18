@@ -9,6 +9,7 @@ import {
   Box,
   Paper,
 } from "@mui/material";
+import { jwtDecode } from "jwt-decode"; // Utilisation correcte du jwtDecode
 
 const LoginPage = () => {
   const [mail, setMail] = useState(""); // Renommé userId en mail
@@ -26,22 +27,35 @@ const LoginPage = () => {
     }
 
     try {
-      navigate("/home");
-      
-      /*
       // Appel à l'API pour la connexion avec mail et passwd
       const data = await login(mail, passwd);
 
+      console.log("Données: ", data);
+
+      // Récupérer le token de la réponse
+      const token = data.tokenOrMessage; // Utiliser 'tokenOrMessage' ici
+      if (!token) {
+        throw new Error("Token manquant dans la réponse");
+      }
+
+      // Décoder le token JWT
+      const decodedToken = jwtDecode(token); // Décoder le token JWT avec `jwtDecode`
+      console.log("Token décodé:", decodedToken); // Affichez le contenu du token décodé
+
       // Stocke le token et le rôle de l'utilisateur
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", decodedToken.role);
+      localStorage.setItem(
+        "idCompteUtilisateur",
+        decodedToken.idCompteUtilisateur
+      );
 
       // Vérifie le rôle et redirige en conséquence
       if (data.role === "admin") {
         navigate("/admin-dashboard"); // Redirige vers le tableau de bord admin
       } else {
         navigate("/home"); // Redirige vers la page d'accueil pour l'utilisateur normal
-      }*/
+      }
     } catch (err) {
       // En cas d'erreur, afficher un message d'erreur
       setError("Identifiant ou mot de passe incorrect");
