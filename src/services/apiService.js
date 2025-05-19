@@ -60,4 +60,29 @@ export const getBalance = async () => {
   }
 };
 
+export const effectuerRetrait = async (montant) => {
+  const idCompteUtilisateur = localStorage.getItem("idCompteUtilisateur");
+  const token = localStorage.getItem("token");
+
+  if (!token || !idCompteUtilisateur) {
+    throw new Error("Utilisateur non connecté.");
+  }
+
+  const response = await apiRest.post(
+    "/operations",
+    {
+      valeur: montant,
+      idTypeOperation: 2, // id du type "Retrait" (à adapter si différent)
+      idCompteUtilisateur: parseInt(idCompteUtilisateur),
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
 export default apiRest;
