@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Typography,
@@ -11,17 +11,38 @@ import {
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalAtmIcon from "@mui/icons-material/LocalAtm";
+import { getBalance } from "../services/apiService";
 
 const WithdrawPage = () => {
   const navigate = useNavigate();
+  const [balance, setBalance] = useState(null);
+  const [idCompteUtilisateur, setIdCompteUtilisateur] = useState(null);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const data = await getBalance();
+        setBalance(data.balance);
+        const id = localStorage.getItem("idCompteUtilisateur");
+        setIdCompteUtilisateur(id);
+      } catch (err) {
+        console.error("Erreur lors de la récupération du solde :", err);
+      }
+    };
+
+    fetchBalance();
+  }, []);
 
   const handleGoBack = () => {
-    navigate("/home"); // modifie le chemin si besoin
+    navigate("/home");
   };
 
   const handleAmountClick = (amount) => {
-    // Logique de retrait à ajouter ici
     console.log(`Montant sélectionné : ${amount}`);
+  };
+
+  const formatAccountId = (id) => {
+    return String(id).padStart(8, "0"); // Exemple : 00000123
   };
 
   return (
@@ -91,13 +112,13 @@ const WithdrawPage = () => {
         <Box textAlign="center">
           <Typography variant="h6">Compte à vue</Typography>
           <Typography variant="h5" fontWeight="bold">
-            XXXX XXXX XXX
+            {idCompteUtilisateur ? formatAccountId(idCompteUtilisateur) : "XXXX XXXX XXX"}
           </Typography>
         </Box>
         <Box textAlign="center">
           <Typography variant="h6">Solde disponible</Typography>
           <Typography variant="h5" fontWeight="bold">
-            MGA&nbsp;XXXXXXXXXX
+            {balance !== null ? `MGA ${balance.toLocaleString("fr-FR")}` : "MGA XXXXXXXXXX"}
           </Typography>
         </Box>
       </Stack>
@@ -109,34 +130,20 @@ const WithdrawPage = () => {
 
       {/* Boutons de montants */}
       <Grid container spacing={2} maxWidth="sm" justifyContent="center">
-        {[
-          100000,
-          150000,
-          200000,
-          250000,
-          300000,
-          350000,
-          400000,
-          450000,
-          "Autres montants",
-        ].map((value, index) => (
-          <Grid item xs={4} key={index}>
-            <Button
-              fullWidth
-              variant="outlined"
-              sx={{
-                height: 60,
-                fontSize: "1rem",
-                borderRadius: 2,
-              }}
-              onClick={() => handleAmountClick(value)}
-            >
-              {typeof value === "number"
-                ? value.toLocaleString("fr-FR")
-                : value}
-            </Button>
-          </Grid>
-        ))}
+        {[100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, "Autres montants"].map(
+          (value, index) => (
+            <Grid item xs={4} key={index}>
+              <Button
+                fullWidth
+                variant="outlined"
+                sx={{ height: 60, fontSize: "1rem", borderRadius: 2 }}
+                onClick={() => handleAmountClick(value)}
+              >
+                {typeof value === "number" ? value.toLocaleString("fr-FR") : value}
+              </Button>
+            </Grid>
+          )
+        )}
       </Grid>
     </Container>
   );

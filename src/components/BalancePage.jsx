@@ -24,8 +24,11 @@ const BalancePage = () => {
     const fetchBalance = async () => {
       try {
         const data = await getBalance(); // Appel API pour récupérer le solde et l'ID du compte
+
+        const id = localStorage.getItem("idCompteUtilisateur");
+
         setBalance(data.balance); // Mettez à jour le solde
-        setIdCompteUtilisateur(data.idCompteUtilisateur); // Mettez à jour l'ID du compte utilisateur
+        setIdCompteUtilisateur(id); // Mettez à jour l'ID du compte utilisateur
         setLoading(false); // Fin du chargement
       } catch (err) {
         setError("Erreur de récupération du solde");
@@ -137,7 +140,7 @@ const BalancePage = () => {
             ) : error ? (
               error
             ) : (
-              `MGA ${balance}` // Affiche le solde récupéré
+              `MGA ${balance.toLocaleString("fr-FR")}` // Affiche le solde récupéré
             )}
           </Typography>
         </Box>
