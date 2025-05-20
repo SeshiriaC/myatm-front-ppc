@@ -17,7 +17,9 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useNavigate } from "react-router-dom";
-import apiRest from "../services/apiService"; // Import axios configuré avec JWT
+import apiRest from "../services/apiService";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const TransactionHistoryPage = () => {
   const navigate = useNavigate();
@@ -48,6 +50,50 @@ const TransactionHistoryPage = () => {
 
   const handleGoBack = () => {
     navigate("/home");
+  };
+
+  const handleDownloadPDF = () => {
+    if (operationsData.length === 0) {
+      alert("Aucune opération à télécharger.");
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    doc.text("Historique des opérations", 14, 20);
+
+    const columns = [
+      { header: "Date", dataKey: "date" },
+      { header: "Opération", dataKey: "operation" },
+      { header: "Référence", dataKey: "reference" },
+      { header: "Montant", dataKey: "amount" },
+    ];
+
+    const rows = operationsData.map((op) => {
+      const timestamp = new Date(op.dateOperation).getTime();
+      const firstLetter = op.denominationOperation
+        ? op.denominationOperation.charAt(0).toUpperCase()
+        : "X";
+      const userId = op.idCompteUtilisateur ?? "0";
+      const reference = `REF${timestamp}${firstLetter}${userId}`;
+
+      return {
+        date: new Date(op.dateOperation).toLocaleString("fr-FR"),
+        operation: op.denominationOperation || "Opération",
+        reference: reference,
+        amount: `MGA ${Number(op.valeur).toLocaleString("fr-FR")}`,
+      };
+    });
+
+    autoTable(doc, {
+      startY: 30,
+      columns,
+      body: rows,
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [100, 100, 100] },
+    });
+
+    doc.save("historique_operations.pdf");
   };
 
   return (
@@ -139,22 +185,32 @@ const TransactionHistoryPage = () => {
                   .includes("retrait");
                 const montantColor = isRetrait ? "error.main" : "success.main";
 
+                const timestamp = new Date(op.dateOperation).getTime();
+                const firstLetter = op.denominationOperation
+                  ? op.denominationOperation.charAt(0).toUpperCase()
+                  : "X";
+                const userId = op.idCompteUtilisateur ?? "0";
+                const reference = `REF${timestamp}${firstLetter}${userId}`;
+
                 return (
                   <TableRow key={index}>
                     <TableCell>
                       <Typography fontWeight={600}>
-                        {new Date(op.dateOperation).toLocaleDateString("fr-FR", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
+                        {new Date(op.dateOperation).toLocaleDateString(
+                          "fr-FR",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography fontWeight="bold">
                         {op.denominationOperation || "Opération"}
                       </Typography>
-                      <Typography color="gray">Réf: {op.idOperation}</Typography>
+                      <Typography color="gray">Réf: {reference}</Typography>
                     </TableCell>
                     <TableCell align="right">
                       <Typography fontWeight={600} color={montantColor}>
@@ -169,28 +225,20 @@ const TransactionHistoryPage = () => {
         </TableContainer>
       )}
 
-      {/* Pagination & Télécharger */}
+      {/* Télécharger */}
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
           alignItems: "center",
           mt: 4,
         }}
       >
-        {/* Pagination simple */}
-        <Box>
-          <Button disabled>&lt;</Button>
-          <Button variant="outlined">1</Button>
-          <Button disabled>&gt;</Button>
-        </Box>
-
-        {/* Download button (à implémenter) */}
         <Button
           variant="outlined"
           endIcon={<DownloadIcon />}
           sx={{ borderRadius: 10 }}
-          onClick={() => alert("Fonction téléchargement à implémenter")}
+          onClick={handleDownloadPDF}
         >
           Télécharger
         </Button>
