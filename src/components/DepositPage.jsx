@@ -31,6 +31,7 @@ const DepositPage = () => {
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const [customAmountOpen, setCustomAmountOpen] = useState(false);
   const [customAmount, setCustomAmount] = useState("");
+  const [showOptions, setShowOptions] = useState(false); // pour afficher boutons après dépôt
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -67,6 +68,8 @@ const DepositPage = () => {
       setSuccessMessage(
         `Dépôt de MGA ${selectedAmount.toLocaleString("fr-FR")} effectué avec succès`
       );
+      setShowOptions(true);  // Affiche les options Nouvelle opération / Quitter
+
       const data = await getBalance();
       setBalance(data.balance);
     } catch (err) {
@@ -87,6 +90,13 @@ const DepositPage = () => {
   };
 
   const formatAccountId = (id) => String(id).padStart(8, "0");
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("idCompteUtilisateur");
+    localStorage.removeItem("role");
+    navigate("/");
+  };
 
   return (
     <Container
@@ -117,6 +127,7 @@ const DepositPage = () => {
             backgroundColor: "#333",
           },
         }}
+        aria-label="Retour"
       >
         <ArrowBackIcon sx={{ fontSize: 32 }} />
       </IconButton>
@@ -152,17 +163,13 @@ const DepositPage = () => {
         <Box textAlign="center">
           <Typography variant="h6">Compte à vue</Typography>
           <Typography variant="h5" fontWeight="bold">
-            {idCompteUtilisateur
-              ? formatAccountId(idCompteUtilisateur)
-              : "XXXXXXXX"}
+            {idCompteUtilisateur ? formatAccountId(idCompteUtilisateur) : "XXXXXXXX"}
           </Typography>
         </Box>
         <Box textAlign="center">
           <Typography variant="h6">Solde actuel</Typography>
           <Typography variant="h5" fontWeight="bold">
-            {balance !== null
-              ? `MGA ${balance.toLocaleString("fr-FR")}`
-              : "MGA --------"}
+            {balance !== null ? `MGA ${balance.toLocaleString("fr-FR")}` : "MGA --------"}
           </Typography>
         </Box>
       </Stack>
@@ -198,6 +205,17 @@ const DepositPage = () => {
           {successMessage}
         </Alert>
       </Snackbar>
+
+      {showOptions && (
+        <Stack direction="row" spacing={4} mt={4}>
+          <Button variant="outlined" onClick={() => navigate("/home")}>
+            Nouvelle opération
+          </Button>
+          <Button variant="contained" onClick={handleLogout}>
+            Quitter
+          </Button>
+        </Stack>
+      )}
 
       <Dialog open={confirmationOpen} onClose={() => setConfirmationOpen(false)}>
         <DialogTitle fontWeight="bold">Dépôt</DialogTitle>
