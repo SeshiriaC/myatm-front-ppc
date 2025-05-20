@@ -105,4 +105,18 @@ export const effectuerDepot = async (montant) => {
   }
 };
 
+// Fonction pour récupérer l'historique des dernières opérations de l'utilisateur connecté
+export const getHistorique = async () => {
+  try {
+    const response = await apiRest.get("/operations/historique");
+    return response.data; // Retourne la liste des OperationDto
+  } catch (error) {
+    throw (
+      error.response?.data || {
+        message: "Erreur lors de la récupération de l'historique",
+      }
+    );
+  }
+};
+
 export default apiRest;
