@@ -124,20 +124,26 @@ const TransactionHistoryPage = () => {
           position: "relative",
         }}
       >
+        {/* Header */}
         <Box
           sx={{
             position: "absolute",
-            top: 0,
-            right: 0,
+            top: 24,
+            right: 24,
+            borderRadius: "32px",
+            paddingX: 4,
+            paddingY: 1.5,
+            fontSize: "1.25rem",
             border: "1px solid black",
-            borderRadius: 10,
-            padding: "12px 24px",
+            fontWeight: "bold",
+            textTransform: "uppercase",
+            color: "#000",
             display: "flex",
             alignItems: "center",
-            fontSize: "1.2rem",
+            gap: 1,
           }}
         >
-          <Typography sx={{ mr: 1 }}>Historique des opérations</Typography>
+          HISTORIQUE DES OPÉRATIONS
           <SwapHorizIcon />
         </Box>
       </Box>
