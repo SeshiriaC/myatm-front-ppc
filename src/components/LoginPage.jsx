@@ -30,7 +30,24 @@ const LoginPage = () => {
       // Appel à l'API pour la connexion avec mail et passwd
       const data = await login(mail, passwd);
 
-      console.log("Données: ", data);
+      // Dans LoginPage, avant l'appel à login(), ajoute un log
+      console.log("Avant login - localStorage:", {
+        token: localStorage.getItem("token"),
+        idCompteUtilisateur: localStorage.getItem("idCompteUtilisateur"),
+        role: localStorage.getItem("role"),
+        mail,
+        passwd,
+      });
+
+      console.log("Réponse login:", data);
+
+      // Après avoir reçu la réponse de login, log les données reçues et ce qui sera stocké :
+      console.log("Réponse login:", data);
+      console.log("Stockage session - avant setItem", {
+        token: localStorage.getItem("token"),
+        idCompteUtilisateur: localStorage.getItem("idCompteUtilisateur"),
+        role: localStorage.getItem("role"),
+      });
 
       // Récupérer le token de la réponse
       const token = data.tokenOrMessage; // Utiliser 'tokenOrMessage' ici
@@ -49,6 +66,13 @@ const LoginPage = () => {
         "idCompteUtilisateur",
         decodedToken.idCompteUtilisateur
       );
+
+      //Test
+      console.log("Stockage session - après setItem", {
+        token: localStorage.getItem("token"),
+        idCompteUtilisateur: localStorage.getItem("idCompteUtilisateur"),
+        role: localStorage.getItem("role"),
+      });
 
       // Vérifie le rôle et redirige en conséquence
       if (data.role === "admin") {

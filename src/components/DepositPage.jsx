@@ -17,17 +17,16 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import LocalAtmIcon from "@mui/icons-material/LocalAtm";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
-import { getBalance, effectuerRetrait } from "../services/apiService";
+import { getBalance, effectuerDepot } from "../services/apiService";
 
-const WithdrawPage = () => {
+const DepositPage = () => {
   const navigate = useNavigate();
   const [balance, setBalance] = useState(null);
   const [idCompteUtilisateur, setIdCompteUtilisateur] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
-  const [showOptions, setShowOptions] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState(null);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const [customAmountOpen, setCustomAmountOpen] = useState(false);
@@ -57,34 +56,29 @@ const WithdrawPage = () => {
       setSelectedAmount(amount);
       setConfirmationOpen(true);
     } else {
-      // "Autres montants"
       setCustomAmountOpen(true);
     }
   };
 
-  const confirmerRetrait = async () => {
+  const confirmerDepot = async () => {
     setConfirmationOpen(false);
     try {
-      await effectuerRetrait(selectedAmount);
+      await effectuerDepot(selectedAmount);
       setSuccessMessage(
-        `Retrait de MGA ${selectedAmount.toLocaleString(
-          "fr-FR"
-        )} effectué avec succès`
+        `Dépôt de MGA ${selectedAmount.toLocaleString("fr-FR")} effectué avec succès`
       );
-      setShowOptions(true);
-
       const data = await getBalance();
       setBalance(data.balance);
     } catch (err) {
-      console.error("Erreur de retrait :", err);
-      alert(err.response?.data?.message || "Échec du retrait.");
+      console.error("Erreur de dépôt :", err);
+      alert(err.response?.data?.message || "Échec du dépôt.");
     }
   };
 
   const validerMontantPersonnalise = () => {
     const amount = parseInt(customAmount, 10);
-    if (isNaN(amount) || amount < 5000 || amount > 600000) {
-      alert("Veuillez entrer un montant valide entre 5 000 et 600 000 MGA.");
+    if (isNaN(amount) || amount < 1000 || amount > 1000000) {
+      alert("Veuillez entrer un montant valide entre 1 000 et 1 000 000 MGA.");
       return;
     }
     setCustomAmountOpen(false);
@@ -93,13 +87,6 @@ const WithdrawPage = () => {
   };
 
   const formatAccountId = (id) => String(id).padStart(8, "0");
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("idCompteUtilisateur");
-    localStorage.removeItem("role");
-    navigate("/");
-  };
 
   return (
     <Container
@@ -130,7 +117,6 @@ const WithdrawPage = () => {
             backgroundColor: "#333",
           },
         }}
-        aria-label="Retour"
       >
         <ArrowBackIcon sx={{ fontSize: 32 }} />
       </IconButton>
@@ -150,9 +136,9 @@ const WithdrawPage = () => {
           display: "flex",
           alignItems: "center",
         }}
-        endIcon={<LocalAtmIcon sx={{ fontSize: 30 }} />}
+        endIcon={<AttachMoneyIcon sx={{ fontSize: 30 }} />}
       >
-        Retrait
+        Dépôt
       </Button>
 
       <Stack
@@ -172,7 +158,7 @@ const WithdrawPage = () => {
           </Typography>
         </Box>
         <Box textAlign="center">
-          <Typography variant="h6">Solde disponible</Typography>
+          <Typography variant="h6">Solde actuel</Typography>
           <Typography variant="h5" fontWeight="bold">
             {balance !== null
               ? `MGA ${balance.toLocaleString("fr-FR")}`
@@ -182,34 +168,24 @@ const WithdrawPage = () => {
       </Stack>
 
       <Typography variant="h5" fontWeight="bold" gutterBottom>
-        Montant à retirer (MGA)
+        Montant à déposer (MGA)
       </Typography>
 
       <Grid container spacing={2} maxWidth="sm" justifyContent="center">
-        {[
-          100000,
-          150000,
-          200000,
-          250000,
-          300000,
-          350000,
-          400000,
-          450000,
-          "Autres montants",
-        ].map((value, index) => (
-          <Grid item xs={4} key={index}>
-            <Button
-              fullWidth
-              variant="outlined"
-              sx={{ height: 60, fontSize: "1rem", borderRadius: 2 }}
-              onClick={() => handleAmountClick(value)}
-            >
-              {typeof value === "number"
-                ? value.toLocaleString("fr-FR")
-                : value}
-            </Button>
-          </Grid>
-        ))}
+        {[50000, 100000, 200000, 300000, 500000, 750000, 1000000, "Autres montants"].map(
+          (value, index) => (
+            <Grid item xs={4} key={index}>
+              <Button
+                fullWidth
+                variant="outlined"
+                sx={{ height: 60, fontSize: "1rem", borderRadius: 2 }}
+                onClick={() => handleAmountClick(value)}
+              >
+                {typeof value === "number" ? value.toLocaleString("fr-FR") : value}
+              </Button>
+            </Grid>
+          )
+        )}
       </Grid>
 
       <Snackbar
@@ -223,28 +199,19 @@ const WithdrawPage = () => {
         </Alert>
       </Snackbar>
 
-      {showOptions && (
-        <Stack direction="row" spacing={4} mt={4}>
-          <Button variant="outlined" onClick={() => navigate("/home")}>
-            Nouvelle opération
-          </Button>
-          <Button variant="contained" onClick={handleLogout}>
-            Quitter
-          </Button>
-        </Stack>
-      )}
-
-      <Dialog
-        open={confirmationOpen}
-        onClose={() => setConfirmationOpen(false)}
-      >
-        <DialogTitle fontWeight="bold">Retrait</DialogTitle>
+      <Dialog open={confirmationOpen} onClose={() => setConfirmationOpen(false)}>
+        <DialogTitle fontWeight="bold">Dépôt</DialogTitle>
         <DialogContent>
           <Typography>
-            Vous allez procéder au retrait de <br />
-            <strong>MGA {selectedAmount?.toLocaleString("fr-FR")}</strong>.
+            Vous allez déposer <br />
+            <strong>
+              MGA {selectedAmount?.toLocaleString("fr-FR")}
+            </strong>
+            .
           </Typography>
-          <Typography mt={2}>Êtes-vous sûr de vouloir continuer ?</Typography>
+          <Typography mt={2}>
+            Êtes-vous sûr de vouloir continuer ?
+          </Typography>
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
           <Button
@@ -256,7 +223,7 @@ const WithdrawPage = () => {
             Non
           </Button>
           <Button
-            onClick={confirmerRetrait}
+            onClick={confirmerDepot}
             variant="outlined"
             startIcon={<CheckIcon />}
             sx={{ borderRadius: 4 }}
@@ -266,14 +233,11 @@ const WithdrawPage = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={customAmountOpen}
-        onClose={() => setCustomAmountOpen(false)}
-      >
-        <DialogTitle fontWeight="bold">Retrait</DialogTitle>
+      <Dialog open={customAmountOpen} onClose={() => setCustomAmountOpen(false)}>
+        <DialogTitle fontWeight="bold">Dépôt</DialogTitle>
         <DialogContent>
           <Typography>
-            Veuillez saisir le montant à retirer (MGA 5 000 - 600 000) :
+            Veuillez saisir le montant à déposer (MGA 1 000 - 1 000 000) :
           </Typography>
           <TextField
             fullWidth
@@ -282,7 +246,7 @@ const WithdrawPage = () => {
             value={customAmount}
             onChange={(e) => setCustomAmount(e.target.value)}
             type="number"
-            inputProps={{ min: 5000, max: 600000 }}
+            inputProps={{ min: 1000, max: 1000000 }}
           />
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
@@ -308,4 +272,4 @@ const WithdrawPage = () => {
   );
 };
 
-export default WithdrawPage;
+export default DepositPage;

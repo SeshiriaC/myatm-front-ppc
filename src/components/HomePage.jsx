@@ -6,26 +6,40 @@ import { useNavigate } from "react-router-dom";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 const HomePage = () => {
   const navigate = useNavigate();
 
   const handleNavigateToOperations = () => {
-    navigate("/operations"); // Rediriger vers la page des opérations
+    navigate("/operations");
   };
 
   const handleNavigateToBalance = () => {
-    navigate("/balance"); // Rediriger vers la page de consultation du solde
+    navigate("/balance");
   };
 
   const handleNavigateToWithdraw = () => {
-    navigate("/withdraw"); // Rediriger vers la page de retrait
+    navigate("/withdraw");
+  };
+
+  const handleNavigateToDeposit = () => {
+    navigate("/deposit");
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Retirer le token et déconnecter l'utilisateur
-    navigate("/"); // Rediriger vers la page de login
+    localStorage.removeItem("token");
+    localStorage.removeItem("idCompteUtilisateur");
+    localStorage.removeItem("role");
+
+    console.log("Logout - après clear localStorage", {
+      token: localStorage.getItem("token"),
+      idCompteUtilisateur: localStorage.getItem("idCompteUtilisateur"),
+      role: localStorage.getItem("role"),
+    });
+
+    navigate("/");
   };
 
   return (
@@ -50,10 +64,9 @@ const HomePage = () => {
           width: "100%",
           maxWidth: "850px",
           height: "100%",
-          maxHeight: "600px"
+          maxHeight: "600px",
         }}
       >
-       
         <Box sx={{ display: "flex", flexDirection: "column", width: "50%" }}>
           <Paper
             sx={{
@@ -87,14 +100,13 @@ const HomePage = () => {
           </Paper>
         </Box>
 
-        
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-end",
             width: "50%",
-            gap: 4, // Espacement entre les boutons
+            gap: 4,
           }}
         >
           <Button
@@ -104,7 +116,7 @@ const HomePage = () => {
             sx={{
               backgroundColor: "#646cff",
               "&:hover": { backgroundColor: "#535bf2" },
-              width: "350px", // Largeur fixée des boutons
+              width: "350px",
               borderRadius: "50px",
               padding: "12px 30px",
               textTransform: "none",
@@ -121,7 +133,7 @@ const HomePage = () => {
             sx={{
               backgroundColor: "#646cff",
               "&:hover": { backgroundColor: "#535bf2" },
-              width: "350px", // Largeur fixée des boutons
+              width: "350px",
               borderRadius: "30px",
               padding: "12px 30px",
               textTransform: "none",
@@ -134,11 +146,28 @@ const HomePage = () => {
           <Button
             variant="contained"
             size="large"
+            startIcon={<MonetizationOnIcon />}
+            sx={{
+              backgroundColor: "#4caf50",
+              "&:hover": { backgroundColor: "#43a047" },
+              width: "350px",
+              borderRadius: "30px",
+              padding: "12px 30px",
+              textTransform: "none",
+            }}
+            onClick={handleNavigateToDeposit}
+          >
+            Dépôt d'argent
+          </Button>
+
+          <Button
+            variant="contained"
+            size="large"
             startIcon={<AttachMoneyIcon />}
             sx={{
               backgroundColor: "#646cff",
               "&:hover": { backgroundColor: "#535bf2" },
-              width: "350px", // Largeur fixée des boutons
+              width: "350px",
               borderRadius: "30px",
               padding: "12px 30px",
               textTransform: "none",
@@ -156,7 +185,7 @@ const HomePage = () => {
               borderColor: "#646cff",
               color: "#646cff",
               "&:hover": { borderColor: "#535bf2", color: "#535bf2" },
-              width: "350px", // Largeur fixée des boutons
+              width: "350px",
               borderRadius: "30px",
               padding: "12px 30px",
               textTransform: "none",

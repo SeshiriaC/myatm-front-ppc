@@ -7,6 +7,7 @@ import HomePage from "./components/HomePage";
 import AdminDashboard from "./components/AdminDashboard";
 import BalancePage from "./components/BalancePage";
 import WithdrawPage from "./components/WithdrawPage";
+import DepositPage from "./components/DepositPage";
 
 const App = () => {
   return (
@@ -24,6 +25,8 @@ const App = () => {
         <Route path="/balance" element={<BalancePage />} />
 
         <Route path="/withdraw" element={<WithdrawPage />} />
+
+        <Route path="/deposit" element={<DepositPage />} />
       </Routes>
     </Router>
   );

@@ -1,26 +1,42 @@
 import axios from "axios";
+import { jwtDecode } from "jwt-decode"; // Import nommé correct
 
-// URL de base de ton backend Spring Boot
 const API_URL = "http://localhost:8080/api";
 
-// Créer une instance d'Axios avec une configuration par défaut
 const apiRest = axios.create({
   baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
 });
 
-// Ajouter un intercepteur pour insérer le token JWT dans les headers
+const logoutAndRedirect = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("idCompteUtilisateur");
+  localStorage.removeItem("role");
+  window.location.href = "/";
+};
+
 apiRest.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
+      const decoded = jwtDecode(token);
+      if (Date.now() >= decoded.exp * 1000) {
+        logoutAndRedirect();
+        return Promise.reject(new Error("Token expiré"));
+      }
       config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
+  (error) => Promise.reject(error)
+);
+
+apiRest.interceptors.response.use(
+  (response) => response,
   (error) => {
+    if (error.response && error.response.status === 401) {
+      logoutAndRedirect();
+    }
     return Promise.reject(error);
   }
 );
@@ -30,7 +46,7 @@ export const login = async (mail, passwd) => {
   try {
     const response = await apiRest.post("/login", { mail, passwd });
     console.log("Utilisateur: ", response.data);
-    return response.data; // Contient le token JWT
+    return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Erreur de connexion" };
   }
@@ -38,20 +54,15 @@ export const login = async (mail, passwd) => {
 
 // Fonction pour récupérer le solde
 export const getBalance = async () => {
-  const idCompteUtilisateur = localStorage.getItem("idCompteUtilisateur"); // Utiliser idCompteUtilisateur ici
-  if (!idCompteUtilisateur) {
-    console.log("! idCompteUtilisateur");
+  const idCompteUtilisateur = localStorage.getItem("idCompteUtilisateur");
+  if (!idCompteUtilisateur)
     throw new Error("ID du compte utilisateur introuvable");
-  }
 
   try {
-    // Appel à l'API pour récupérer le solde de l'utilisateur
     const response = await apiRest.get(`/comptes/solde/${idCompteUtilisateur}`);
-
-    // Récupérer le solde et l'ID du compte
     return {
-      balance: response.data.solde, // Récupérer le solde
-      idCompteUtilisateur: response.data.idCompteUtilisateur, // Récupérer l'ID du compte utilisateur
+      balance: response.data.solde,
+      idCompteUtilisateur: response.data.idCompteUtilisateur,
     };
   } catch (error) {
     throw (
@@ -60,29 +71,38 @@ export const getBalance = async () => {
   }
 };
 
+// Fonction pour effectuer un retrait
 export const effectuerRetrait = async (montant) => {
   const idCompteUtilisateur = localStorage.getItem("idCompteUtilisateur");
-  const token = localStorage.getItem("token");
+  if (!idCompteUtilisateur) throw new Error("Utilisateur non connecté.");
 
-  if (!token || !idCompteUtilisateur) {
-    throw new Error("Utilisateur non connecté.");
-  }
-
-  const response = await apiRest.post(
-    "/operations",
-    {
+  try {
+    const response = await apiRest.post("/operations", {
       valeur: montant,
-      idTypeOperation: 2, // id du type "Retrait" (à adapter si différent)
+      idTypeOperation: 2,
       idCompteUtilisateur: parseInt(idCompteUtilisateur),
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Erreur lors du retrait" };
+  }
+};
 
-  return response.data;
+// Fonction pour effectuer un dépôt
+export const effectuerDepot = async (montant) => {
+  const idCompteUtilisateur = localStorage.getItem("idCompteUtilisateur");
+  if (!idCompteUtilisateur) throw new Error("Utilisateur non connecté.");
+
+  try {
+    const response = await apiRest.post("/operations", {
+      valeur: montant,
+      idTypeOperation: 1, // 1 pour dépôt
+      idCompteUtilisateur: parseInt(idCompteUtilisateur),
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Erreur lors du dépôt" };
+  }
 };
 
 export default apiRest;
