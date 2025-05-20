@@ -52,6 +52,11 @@ const TransactionHistoryPage = () => {
     navigate("/home");
   };
 
+  // Fonction de formatage manuel avec espaces simples entre milliers
+  const formatNumberWithSpaces = (x) => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  };
+
   const handleDownloadPDF = () => {
     if (operationsData.length === 0) {
       alert("Aucune opération à télécharger.");
@@ -77,11 +82,14 @@ const TransactionHistoryPage = () => {
       const userId = op.idCompteUtilisateur ?? "0";
       const reference = `REF${timestamp}${firstLetter}${userId}`;
 
+      // Formatage manuel sans caractères invisibles
+      const amountFormatted = formatNumberWithSpaces(Math.round(op.valeur));
+
       return {
         date: new Date(op.dateOperation).toLocaleString("fr-FR"),
         operation: op.denominationOperation || "Opération",
         reference: reference,
-        amount: `MGA ${Number(op.valeur).toLocaleString("fr-FR")}`,
+        amount: `MGA ${amountFormatted}`,
       };
     });
 
@@ -124,7 +132,6 @@ const TransactionHistoryPage = () => {
           position: "relative",
         }}
       >
-        {/* Header */}
         <Box
           sx={{
             position: "absolute",
@@ -220,7 +227,7 @@ const TransactionHistoryPage = () => {
                     </TableCell>
                     <TableCell align="right">
                       <Typography fontWeight={600} color={montantColor}>
-                        MGA {Number(op.valeur).toLocaleString("fr-FR")}
+                        MGA {formatNumberWithSpaces(Math.round(op.valeur))}
                       </Typography>
                     </TableCell>
                   </TableRow>
